@@ -11,21 +11,21 @@ def toBits(l):
 
 def chunks(l, n):
     """Yield n number of striped chunks from l."""
-    for i in range(0, n):
-        yield l[i::n]
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
 
 def toBinary(l):
-  return ''.join(map(str,l))
+  return int(''.join(map(str,l)),2)
 
 
 # Specify gpio pin
 port = 17
 
-# to use Raspberry Pi board pin numbers
-GPIO.setmode(GPIO.BCM)
-
 def read_dht11():
 
+  # to use Raspberry Pi board pin numbers
+  GPIO.setmode(GPIO.BCM)
+ 
   data = [] # Define data array
 
   #### Activate sensor ####
@@ -51,19 +51,19 @@ def read_dht11():
   for i in range(0,600):
     data.append(GPIO.input(port))
 
-  print(data)
   bitsList = list(filter(None,''.join(map(str,data)).split("0")))
-  print(bitsList)
   data = list(map(toBits, bitsList))[:-1]
-  print(data)
-  print(len(data))
-  chunkList = list(chunks(data,5))
-  print(chunkList);
-#binaryList = list(map(toBinary, chunkList))
-  #print(binaryList)
-  #print(bin(int(binaryList[0], 2) & int(binaryList[1],2) & int(binaryList[2],2) & int(binaryList[3],2)))
+  chunkList = list(chunks(data,8))
+  binaryList = list(map(toBinary, chunkList))
+  print(binaryList)
+  print(sum(binaryList[:4])) 
+
+  # If data is correct
+  if len(data) == 40 and sum(binaryList[:4]) == binaryList[4]:
+    return binaryList
+  else:
+    sleep(1)
+    #read_dht11()
+    #return float(str(binaryList[0])+"."+str(binaryList[1]), float(str(binaryList[2])+"."+str(binaryList[3])
 
 read_dht11()
-sleep(1)
-#binarySum = bin(int(binaryList[0], 2) + int(binaryList[1],2) + int(binaryList[2],2) + int(binaryList[3],2))
-#print(binarySum)
