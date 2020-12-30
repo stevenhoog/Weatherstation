@@ -60,11 +60,9 @@ def read_dht11():
   # If data is correct
   if len(data) >= 40 and sum(binaryList[:4]) == binaryList[4]:
     print(binaryList[:-1])
-#  else:
-#    sleep(1)
-    #read_dht11()
-    #return float(str(binaryList[0])+"."+str(binaryList[1]), float(str(binaryList[2])+"."+str(binaryList[3])
 
 while True:
   read_dht11()
   sleep(0.02)
+
+GPIO.cleanup()

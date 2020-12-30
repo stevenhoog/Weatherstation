@@ -9,6 +9,8 @@ import adafruit_bmp280
 
 # Create library object using our Bus I2C port
 i2c = busio.I2C(board.SCL, board.SDA)
+
+# Address of i2c bus is 0x76
 bmp280 = adafruit_bmp280.Adafruit_BMP280_I2C(i2c, address = 0x76)
 
 # OR create library object using our Bus SPI port
