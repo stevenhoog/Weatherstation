@@ -7,4 +7,4 @@ dht11 = DHT11(17)
 
 while True:
 	dht11.read()
-	sleep(0.02)
+	sleep(0.01)
