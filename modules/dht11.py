@@ -67,11 +67,21 @@ class DHT11:
     # Zeroes serve as seperators
     bitsList = list(filter(None,''.join(map(str,data)).split("0")))
 
+
     # Make bits of list values
-    data = list(map(self.toBits, bitsList))[:-1]
+    data = list(map(self.toBits, bitsList))
     chunkList = list(self.chunks(data,8))
+    
+
+    if (len(bitsList) == 41):
+      print(f"BITSLIST LENGTH: {len(bitsList)}")
+      print(chunkList)
+  
+    '''
     binaryList = list(map(self.byteToInt, chunkList))
+    print(binaryList)
 
     # If data is correct
     if len(data) >= 40 and sum(binaryList[:4]) == binaryList[4]:
       print(binaryList[:-1])
+    '''
