@@ -1,77 +1,84 @@
 # Import GPIO library
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 
 # Import sleep library
 from time import sleep
 
+
 class DHT11:
 
-  # Constructor
-  def __init__(self, port):
-    self.port = port
-    self.temperature = 0
-    self.humidity = 0
+    # Constructor
+    def __init__(self, port):
+        self.port = port
+        self.temperature = 0
+        self.humidity = 0
 
-   # If a 1 occurs more than 3 times in l, return 1
-  @staticmethod
-  def toBits(l):
-    return 1 if len(l) > 3 else 0
+    # If a 1 occurs more than 3 times in l, return 1
+    @staticmethod
+    def toBits(l):
+        return 1 if len(l) > 3 else 0
 
-  # Divide list in chunks of n values
-  @staticmethod
-  def chunks(l, n):
-      # Lazy iterator
-      for i in range(0, len(l), n):
-          yield l[i:i + n]
-  
-  # List of bytes to integer values
-  @staticmethod
-  def byteToInt(l):
-    return int(''.join(map(str,l)),2)
+    # Divide list in chunks of n values
+    @staticmethod
+    def chunks(l, n):
+        # Lazy iterator
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
 
-  def activateSensor(self):
+    # List of bytes to integer values
+    @staticmethod
+    def byteToInt(l):
+        return int(''.join(map(str, l)), 2)
 
-    #### Activate sensor ####
+    # #### Activate sensor ####
+    # def activateSensor(self):
 
-    # set up the GPIO channels  - output
-    GPIO.setup(self.port, GPIO.OUT)
-    # Make sure GPIO has default status of HIGH
-    GPIO.output(self.port, GPIO.HIGH)
-    # Set GPIO pin to LOW for 18 milliseconds to ensure DHT11 has detected the signal
-    GPIO.output(self.port, GPIO.LOW)
-    sleep(0.018)
+    #     # set up the GPIO channels  - output
+    #     GPIO.setup(self.port, GPIO.OUT)
+    #     # Make sure GPIO has default status of HIGH
+    #     GPIO.output(self.port, GPIO.HIGH)
+    #     # Set GPIO pin to LOW for 18 milliseconds to ensure DHT11 has detected the signal
+    #     GPIO.output(self.port, GPIO.LOW)
+    #     sleep(0.018)
 
+    # def read(self):
 
-  def read(self):
+    #     # to use Raspberry Pi board pin numbers
+    #     GPIO.setmode(GPIO.BCM)
 
-    # to use Raspberry Pi board pin numbers
-    GPIO.setmode(GPIO.BCM)
+    #     data = []  # Define data array
 
-    data = [] # Define data array
+    #     self.activateSensor()
 
-    self.activateSensor()
+    #     # Set GPIO pin to HIGH
+    #     GPIO.output(self.port, GPIO.HIGH)
+    #     sleep(0.00002)
 
+    #     ### READ BINARY VALUES ###
 
-    # Set GPIO pin to HIGH
-    GPIO.output(self.port, GPIO.HIGH)
-    sleep(0.00002)
+    #     # prepare to read the pin
+    #     GPIO.setup(self.port, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    ### READ BINARY VALUES ###
+    #     for i in range(0, 500):
+    #         data.append(GPIO.input(self.port))
 
-    # prepare to read the pin
-    GPIO.setup(self.port, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    #     self.ParseData(data)
 
-    for i in range(0,500):
-      data.append(GPIO.input(self.port))
+    def ParseData(self, data):
+        # Get list of strings of 1's
+        bitsList = list(filter(None, ''.join(map(str, data)).split("0")))
 
-    # Zeroes serve as seperators
-    bitsList = list(filter(None,''.join(map(str,data)).split("0")))
+        # Make bits of list of strings
+        data = list(map(self.toBits, bitsList))
 
-    # Make bits of list values
-    data = list(map(self.toBits, bitsList))[:-1]
-    chunkList = list(self.chunks(data,8))
-    binaryList = list(map(self.byteToInt, chunkList))
+        # Create 8 bit bytes from solid string of bits
+        chunkList = list(self.chunks(data, 8))
 
-    # If data is correct
-    if len(data) >= 40 and sum(binaryList[:4]) == binaryList[4]:
-      print(binaryList[:-1])
+        # Convert bytes to int
+        binaryList = list(map(self.byteToInt, chunkList))
+
+        # If data is correct
+        if len(data) >= 38 and sum(binaryList[:4]) == binaryList[4]:
+            return binaryList[:-1]
+        else:
+            return False
