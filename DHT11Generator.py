@@ -8,7 +8,7 @@ def CreateData(data):
     # Show data passed to function
     print(f"Data: {data}")
 
-    # Convert ints to 8 bit binary
+    # Convert data to 8 bit binary
     binary = []
     for i in data:
         # First convert the data
@@ -18,25 +18,36 @@ def CreateData(data):
     # Create parity byte
     if(random.randint(0, 1) is 0):
         # Create valid parity byte
-        new_var = sum(data)
-        binary.append('{0:08b}'.format(new_var))
+        binary.append('{0:08b}'.format(sum(data)))
     else:
         # Create invalid parity byte
-        binary.append("00000000")
+        binary.append('{0:08b}'.format(1))
 
     # Log the parity byte
     print(f"Parity byte: {binary[-1]}")
 
     # Combine all bytes so it's easier to loop over
-    bytesCombined = "".join(binary)
-    print(f"Bytes combined: {bytesCombined}")
+    bitsCombined = "".join(binary)
+    print(f"Bytes combined: {bitsCombined}")
 
     # Start the output with random amount of 0's
     output = [0] * random.randint(5, 9)
 
+    # Simulate noise by randomizing the amount of data that comes through
+    bitsToTransfer = random.randint(38, 41)
+    bitsTransferred = 0
+
     # Loop over all the bits
-    for c in bytesCombined:
-        if(c == '1'):
+    for bit in bitsCombined:
+
+        # Exit if all data is transferred
+        if bitsTransferred == bitsToTransfer:
+            break
+
+        # Space out the actual data with a divider of 5 0's
+        output.extend([0] * random.randint(5, 6))
+
+        if(bit == '1'):
             # If bit is 1 create a between 5 and 9 1's
             length = random.randint(threshold + 1, 9)
         else:
@@ -45,11 +56,16 @@ def CreateData(data):
 
         # Add the data to the output
         output.extend([1] * length)
-        # Space out the actual data with a divider of 5 0's
+
+        bitsTransferred += 1
+
+    # Add some extra bits at the end if the transfer length is 41
+    if bitsToTransfer == 41:
         output.extend([0] * 5)
+        output.extend([1] * random.randint(threshold + 1, 9))
 
     # Fill the output at the end with 0's
-    output.extend([0] * (500 - len(output)))
+    output.extend([1] * (500 - len(output)))
 
     # Make a string out of the list for easy printing
     printOutput = "".join("{0}".format(n) for n in output)

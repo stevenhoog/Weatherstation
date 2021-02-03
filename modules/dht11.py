@@ -68,6 +68,9 @@ class DHT11:
         # Get list of strings of 1's
         bitsList = list(filter(None, ''.join(map(str, data)).split("0")))
 
+        print(f"Bitslist : {bitsList}")
+        print(f"Bitslist length : {len(bitsList)}")
+
         # Make bits of list of strings
         data = list(map(self.toBits, bitsList))
 
@@ -75,10 +78,10 @@ class DHT11:
         chunkList = list(self.chunks(data, 8))
 
         # Convert bytes to int
-        binaryList = list(map(self.byteToInt, chunkList))
+        binaryList = list(map(self.byteToInt, chunkList))[:5]
 
         # If data is correct
-        if len(data) >= 38 and sum(binaryList[:4]) == binaryList[4]:
+        if len(data) >= 40 and sum(binaryList[:4]) == binaryList[4]:
             return binaryList[:-1]
         else:
             return False

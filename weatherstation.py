@@ -17,7 +17,8 @@ while True:
 
     # Check if parser past test
     if result == testData:
-        print("CORRECT")
+        print(f"CORRECT: {result}")
+        break
     else:
         # Otherwise try again
         print("DID NOT WORK")
